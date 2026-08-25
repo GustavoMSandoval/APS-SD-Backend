@@ -4,6 +4,8 @@ import com.backend.api.dtos.CompanyLoginDTO;
 import com.backend.api.dtos.CompanyRequestDTO;
 import com.backend.api.dtos.CompanyResponseDTO;
 import com.backend.api.services.CompanyService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,7 +16,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/companies")
-@CrossOrigin(origins = { "http://localhost:3000", "http://localhost:4200" })
+@CrossOrigin(origins = { "http://localhost:3000", "http://localhost:4200" }, allowCredentials = "true")
 public class CompanyController {
 
     private final CompanyService service;
@@ -32,9 +34,20 @@ public class CompanyController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<CompanyResponseDTO> login(@Valid @RequestBody CompanyLoginDTO loginRequest) {
-        CompanyResponseDTO response = service.authenticate(loginRequest.email(), loginRequest.password());
-        return ResponseEntity.ok(response);
+    public ResponseEntity<CompanyResponseDTO> login(
+            @Valid @RequestBody CompanyLoginDTO loginRequest,
+            HttpServletRequest request,
+            HttpServletResponse response) {
+
+        CompanyResponseDTO responseDto = service.authenticate(
+                loginRequest.email(), loginRequest.password(), request, response);
+        return ResponseEntity.ok(responseDto);
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(HttpServletRequest request) {
+        service.logout(request);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping
