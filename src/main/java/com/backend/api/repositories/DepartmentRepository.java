@@ -15,6 +15,7 @@ public interface DepartmentRepository extends JpaRepository<Department, Long> {
     Page<Department> findByCompanyId(Long companyId, Pageable pageable);
 
     Optional<Department> findByName(String name);
+
     Optional<Department> findByNameAndCompanyId(String name, Long companyId);
 
     List<Department> findByCompanyIdAndNameContainingIgnoreCase(Long companyId, String name);
@@ -22,4 +23,6 @@ public interface DepartmentRepository extends JpaRepository<Department, Long> {
     boolean existsByNameAndCompanyId(String name, Long companyId);
 
     Long countByCompanyId(Long companyId);
+
+    Long countByCompanyIdAndNameContainingIgnoreCase(Long companyId, String name);
 }
