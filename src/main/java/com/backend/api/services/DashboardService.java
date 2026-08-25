@@ -29,34 +29,38 @@ public class DashboardService {
     @Transactional(readOnly = true)
     public DashboardResponseDTO getDashboardData(
             Long companyId,
-            Long departmentId,
+            String departmentName,
             DiscardType type,
             DiscardStatus status,
             LocalDateTime startDate,
             LocalDateTime endDate) {
 
         Long totalDepartments;
-        if (departmentId != null) {
-            totalDepartments = departmentRepository.existsById(departmentId) ? 1L : 0L;
-        } else if (companyId != null) {
-            totalDepartments = departmentRepository.countByCompanyId(companyId);
+        if (departmentName != null && !departmentName.trim().isEmpty()) {
+            totalDepartments = departmentRepository.countByCompanyIdAndNameContainingIgnoreCase(companyId, departmentName);
         } else {
-            totalDepartments = departmentRepository.count();
+            totalDepartments = departmentRepository.countByCompanyId(companyId);
         }
 
-        Long totalDiscards = discardMaterialRepository.countTotalDiscardsInPeriod(
-                companyId, departmentId, type, status, startDate, endDate);
+        Long totalDiscards = discardMaterialRepository.countTotalDiscardsInPeriodByDepartmentName(
+                companyId, departmentName, type, status, startDate, endDate
+        );
 
-        List<DepartmentDiscardSummaryDTO> discardsByDepartment = discardMaterialRepository.countDiscardsByDepartment(
-                companyId, type, status, startDate, endDate);
+        List<DepartmentDiscardSummaryDTO> discardsByDepartment = 
+                discardMaterialRepository.countDiscardsByDepartmentName(
+                        companyId, departmentName, type, status, startDate, endDate
+                );
 
-        List<DiscardTypeSummaryDTO> discardsByType = discardMaterialRepository.countDiscardsByType(
-                companyId, departmentId, status, startDate, endDate);
+        List<DiscardTypeSummaryDTO> discardsByType = 
+                discardMaterialRepository.countDiscardsByTypeAndDepartmentName(
+                        companyId, departmentName, status, startDate, endDate
+                );
 
         return new DashboardResponseDTO(
                 totalDepartments,
                 totalDiscards,
                 discardsByDepartment,
-                discardsByType);
+                discardsByType
+        );
     }
 }
