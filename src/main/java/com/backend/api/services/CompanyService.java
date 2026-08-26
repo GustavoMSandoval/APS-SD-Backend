@@ -12,7 +12,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.stereotype.Service;
 
@@ -24,11 +23,15 @@ public class CompanyService {
 
     private final CompanyRepository repository;
     private final PasswordEncoder passwordEncoder;
-    private final SecurityContextRepository securityContextRepository = new HttpSessionSecurityContextRepository();
+    private final SecurityContextRepository securityContextRepository;
 
-    public CompanyService(CompanyRepository repository, PasswordEncoder passwordEncoder) {
+    public CompanyService(
+            CompanyRepository repository,
+            PasswordEncoder passwordEncoder,
+            SecurityContextRepository securityContextRepository) {
         this.repository = repository;
         this.passwordEncoder = passwordEncoder;
+        this.securityContextRepository = securityContextRepository;
     }
 
     private CompanyResponseDTO toResponse(Company company) {
@@ -68,12 +71,13 @@ public class CompanyService {
         }
 
         Authentication auth = new UsernamePasswordAuthenticationToken(
-                company.getId(), null, Collections.emptyList());
+                company.getEmail(), null, Collections.emptyList());
 
         SecurityContext context = SecurityContextHolder.createEmptyContext();
         context.setAuthentication(auth);
         SecurityContextHolder.setContext(context);
 
+        request.getSession(true);
         securityContextRepository.saveContext(context, request, response);
 
         return toResponse(company);
