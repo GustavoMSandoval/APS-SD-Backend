@@ -83,6 +83,12 @@ public class CompanyService {
         return toResponse(company);
     }
 
+    public CompanyResponseDTO findByEmail(String email) {
+        Company company = repository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Empresa não encontrada"));
+        return toResponse(company);
+    }
+
     public void logout(HttpServletRequest request) {
         HttpSession session = request.getSession(false);
         if (session != null) {
