@@ -33,8 +33,8 @@ public class DashboardController {
         Long companyId = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         DashboardResponseDTO dashboard = dashboardService.getDashboardData(
-                companyId, departmentName, type, status, startDate, endDate);
+            companyId, departmentName, type, status, startDate, endDate);
 
-        return ResponseEntity.ok(dashboard);
+        return ResponseEntity.ok(dashboard); 
     }
 }

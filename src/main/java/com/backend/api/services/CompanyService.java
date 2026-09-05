@@ -71,7 +71,7 @@ public class CompanyService {
         }
 
         Authentication auth = new UsernamePasswordAuthenticationToken(
-                company.getEmail(), null, Collections.emptyList());
+                    company.getId(), null, Collections.emptyList());
 
         SecurityContext context = SecurityContextHolder.createEmptyContext();
         context.setAuthentication(auth);
