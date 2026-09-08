@@ -53,12 +53,20 @@ O projeto é dividido em pastas seguindo o modelo de arquitetura em camadas fort
 public class SecurityConfig {
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityContextRepository securityContextRepository() {
+        return new HttpSessionSecurityContextRepository();
+    }
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http,
+            SecurityContextRepository securityContextRepository) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
+                .securityContext(securityContext -> securityContext
+                        .securityContextRepository(securityContextRepository))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/companies/login", "/api/companies", "/api/companies/logout").permitAll()
                         .anyRequest().authenticated());
@@ -68,7 +76,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:3000", "http://localhost:4200"));
+        configuration.setAllowedOriginPatterns(List.of("http://localhost:*", "http://127.0.0.1:*"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
@@ -115,9 +123,9 @@ public class DashboardController {
         Long companyId = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         DashboardResponseDTO dashboard = dashboardService.getDashboardData(
-                companyId, departmentName, type, status, startDate, endDate);
+            companyId, departmentName, type, status, startDate, endDate);
 
-        return ResponseEntity.ok(dashboard);
+        return ResponseEntity.ok(dashboard); 
     }
 }
 
@@ -162,6 +170,14 @@ public class CompanyController {
     public ResponseEntity<Void> logout(HttpServletRequest request) {
         service.logout(request);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<CompanyResponseDTO> getCurrentUser(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(401).build();
+        }
+        return ResponseEntity.ok(service.findByEmail(authentication.getName()));
     }
 
     @GetMapping
@@ -332,11 +348,15 @@ public class CompanyService {
 
     private final CompanyRepository repository;
     private final PasswordEncoder passwordEncoder;
-    private final SecurityContextRepository securityContextRepository = new HttpSessionSecurityContextRepository();
+    private final SecurityContextRepository securityContextRepository;
 
-    public CompanyService(CompanyRepository repository, PasswordEncoder passwordEncoder) {
+    public CompanyService(
+            CompanyRepository repository,
+            PasswordEncoder passwordEncoder,
+            SecurityContextRepository securityContextRepository) {
         this.repository = repository;
         this.passwordEncoder = passwordEncoder;
+        this.securityContextRepository = securityContextRepository;
     }
 
     private CompanyResponseDTO toResponse(Company company) {
@@ -376,14 +396,21 @@ public class CompanyService {
         }
 
         Authentication auth = new UsernamePasswordAuthenticationToken(
-                company.getId(), null, Collections.emptyList());
+                    company.getId(), null, Collections.emptyList());
 
         SecurityContext context = SecurityContextHolder.createEmptyContext();
         context.setAuthentication(auth);
         SecurityContextHolder.setContext(context);
 
+        request.getSession(true);
         securityContextRepository.saveContext(context, request, response);
 
+        return toResponse(company);
+    }
+
+    public CompanyResponseDTO findByEmail(String email) {
+        Company company = repository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Empresa não encontrada"));
         return toResponse(company);
     }
 
@@ -537,3 +564,163 @@ public class DiscardMaterialService {
 ```
 
 Funciona com operações do tipo CRUD da entity DiscardMaterial, fornecendo funções de listagem, criação, etc.
+
+### Entities
+
+**Company.java**
+
+```java
+@Entity
+@Table(name = "companies")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class Company {
+
+    @Id
+    @GeneratedValue (strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false, unique = true, length = 18)
+    private String cnpj;
+
+    @Column(nullable = false, length = 255)
+    private String name;
+
+    @Column(nullable = false, length = 255)
+    private String email;
+
+    @Column(nullable = false)
+    private String password;
+
+    @Column(nullable = false, length = 20)
+    private String phone;
+
+    @CreationTimestamp
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    @Column(nullable = false)
+    private LocalDateTime updatedAt;
+
+    @OneToMany(mappedBy = "company", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<Department> departments;
+}
+```
+
+Funciona como a estrutura de modelagem de banco de dados para a tabela de Company, tendo os atributos necessários para a criação de uma Company como 
+id : sendo o identificador do registro 
+cnpj : como o identificador da empresa
+name : sendo o nome da empresa
+email, password : esses dois sendo usados para validar as informações da empresa
+phone, createdAt, updatedAt : informações adicionais
+departments : funcionando como o relacionamento com as outras tabelas.
+
+**Department.java**
+
+```java
+@Entity
+@Table(name = "departments")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class Department {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false, length = 255)
+    private String name;
+
+    @Column(length = 500)
+    private String description;
+
+    @Column(nullable = false, length = 255)
+    private String responsibleName;
+
+    @CreationTimestamp
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    @Column(nullable = false)
+    private LocalDateTime updatedAt;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "company_id", nullable = false)
+    private Company company;
+
+    @OneToMany(mappedBy = "department", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<DiscardMaterial> discardMaterials;
+}
+```
+
+A entity de Department contém os campos necessários para a criação de um Department no contexto deste projeto
+id : como identificador do registro
+name : nome do departamento
+description : a descrição de departamento
+responsibleName : o nome do responsável pelo departamento
+createdAt : data que foi registrado o departamento
+updatedAt : data em que o departamento foi atualizado
+company : é o relacionamento uma company pode ter n departamentos
+discardMaterials : é o relacionamento de 1 departamento para n materiais de descarte.
+
+**DiscardMaterial.java**
+
+```java
+@Entity
+@Table(name = "discard_materials")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class DiscardMaterial {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private DiscardType type;
+
+    @Column(length = 500)
+    private String description;
+
+    @Column(nullable = false)
+    private LocalDateTime discardDate;
+
+    @CreationTimestamp
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    @Column(nullable = false)
+    private LocalDateTime updatedAt;
+
+    @Column(nullable = false, length = 255)
+    private String employeeWhoDiscarded;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private DiscardStatus status;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "department_id", nullable = false)
+    private Department department;
+}
+```
+
+A entity de DiscardMaterial contém os campos
+id : como identificador do registro
+type : como tipo de descarte
+discardDate : a data em que o descarte foi realizado
+createdAt : data que foi registrado o departamento
+updatedAt : data em que o departamento foi atualizado
+employeeWhoDiscarded : funcionário que realizou o descarte
+status : é o andamento da solicitação de descarte
+department : é a relação 1 para n de descartes
