@@ -7,10 +7,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-
 import com.backend.api.enums.DiscardStatus;
 import com.backend.api.enums.DiscardType;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -35,6 +35,17 @@ public class DiscardMaterial {
     @Column(nullable = false)
     private LocalDateTime discardDate;
 
+    @Column(nullable = false, precision = 10, scale = 2)
+    private BigDecimal weight;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private DiscardStatus status;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -42,13 +53,6 @@ public class DiscardMaterial {
     @UpdateTimestamp
     @Column(nullable = false)
     private LocalDateTime updatedAt;
-
-    @Column(nullable = false, length = 255)
-    private String employeeWhoDiscarded;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private DiscardStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "department_id", nullable = false)
