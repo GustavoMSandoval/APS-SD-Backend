@@ -1,8 +1,8 @@
 package com.backend.api.services;
 
 import com.backend.api.dtos.DashboardResponseDTO;
-import com.backend.api.dtos.DepartmentDiscardSummaryDTO;
-import com.backend.api.dtos.DiscardTypeSummaryDTO;
+import com.backend.api.dtos.department.DepartmentDiscardSummaryDTO;
+import com.backend.api.dtos.discard_material.DiscardTypeSummaryDTO;
 import com.backend.api.enums.DiscardStatus;
 import com.backend.api.enums.DiscardType;
 import com.backend.api.repositories.DepartmentRepository;

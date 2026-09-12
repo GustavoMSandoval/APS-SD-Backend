@@ -1,7 +1,7 @@
 package com.backend.api.controllers;
 
-import com.backend.api.dtos.DiscardMaterialRequestDTO;
-import com.backend.api.dtos.DiscardMaterialResponseDTO;
+import com.backend.api.dtos.discard_material.DiscardMaterialRequestDTO;
+import com.backend.api.dtos.discard_material.DiscardMaterialResponseDTO;
 import com.backend.api.services.DiscardMaterialService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;

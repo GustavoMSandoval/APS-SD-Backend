@@ -1,7 +1,7 @@
 package com.backend.api.services;
 
-import com.backend.api.dtos.DiscardMaterialRequestDTO;
-import com.backend.api.dtos.DiscardMaterialResponseDTO;
+import com.backend.api.dtos.discard_material.DiscardMaterialRequestDTO;
+import com.backend.api.dtos.discard_material.DiscardMaterialResponseDTO;
 import com.backend.api.entities.Department;
 import com.backend.api.entities.DiscardMaterial;
 import com.backend.api.repositories.DepartmentRepository;

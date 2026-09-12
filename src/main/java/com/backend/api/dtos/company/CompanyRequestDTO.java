@@ -1,4 +1,4 @@
-package com.backend.api.dtos;
+package com.backend.api.dtos.company;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

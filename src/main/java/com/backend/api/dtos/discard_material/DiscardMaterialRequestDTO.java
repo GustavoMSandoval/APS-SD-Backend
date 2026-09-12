@@ -1,4 +1,4 @@
-package com.backend.api.dtos;
+package com.backend.api.dtos.discard_material;
 
 import com.backend.api.enums.DiscardStatus;
 import com.backend.api.enums.DiscardType;

@@ -1,7 +1,7 @@
 package com.backend.api.services;
 
-import com.backend.api.dtos.CompanyRequestDTO;
-import com.backend.api.dtos.CompanyResponseDTO;
+import com.backend.api.dtos.company.CompanyRequestDTO;
+import com.backend.api.dtos.company.CompanyResponseDTO;
 import com.backend.api.entities.Company;
 import com.backend.api.repositories.CompanyRepository;
 import jakarta.servlet.http.HttpServletRequest;

@@ -1,4 +1,4 @@
-package com.backend.api.dtos;
+package com.backend.api.dtos.company;
 
 import java.time.LocalDateTime;
 

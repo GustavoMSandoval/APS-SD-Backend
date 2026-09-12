@@ -1,7 +1,7 @@
 package com.backend.api.controllers;
 
-import com.backend.api.dtos.DepartmentRequestDTO;
-import com.backend.api.dtos.DepartmentResponseDTO;
+import com.backend.api.dtos.department.DepartmentRequestDTO;
+import com.backend.api.dtos.department.DepartmentResponseDTO;
 import com.backend.api.services.DepartmentService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;

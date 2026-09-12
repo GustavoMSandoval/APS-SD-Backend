@@ -1,8 +1,8 @@
 package com.backend.api.controllers;
 
-import com.backend.api.dtos.CompanyLoginDTO;
-import com.backend.api.dtos.CompanyRequestDTO;
-import com.backend.api.dtos.CompanyResponseDTO;
+import com.backend.api.dtos.company.CompanyLoginDTO;
+import com.backend.api.dtos.company.CompanyRequestDTO;
+import com.backend.api.dtos.company.CompanyResponseDTO;
 import com.backend.api.services.CompanyService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

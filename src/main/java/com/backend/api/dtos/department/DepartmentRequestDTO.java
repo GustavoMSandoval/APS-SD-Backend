@@ -1,4 +1,4 @@
-package com.backend.api.dtos;
+package com.backend.api.dtos.department;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

@@ -1,7 +1,7 @@
 package com.backend.api.services;
 
-import com.backend.api.dtos.DepartmentRequestDTO;
-import com.backend.api.dtos.DepartmentResponseDTO;
+import com.backend.api.dtos.department.DepartmentRequestDTO;
+import com.backend.api.dtos.department.DepartmentResponseDTO;
 import com.backend.api.entities.Company;
 import com.backend.api.entities.Department;
 import com.backend.api.repositories.CompanyRepository;

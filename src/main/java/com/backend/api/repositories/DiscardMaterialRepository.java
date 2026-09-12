@@ -1,7 +1,7 @@
 package com.backend.api.repositories;
 
-import com.backend.api.dtos.DepartmentDiscardSummaryDTO;
-import com.backend.api.dtos.DiscardTypeSummaryDTO;
+import com.backend.api.dtos.department.DepartmentDiscardSummaryDTO;
+import com.backend.api.dtos.discard_material.DiscardTypeSummaryDTO;
 import com.backend.api.entities.DiscardMaterial;
 import com.backend.api.enums.DiscardStatus;
 import com.backend.api.enums.DiscardType;
