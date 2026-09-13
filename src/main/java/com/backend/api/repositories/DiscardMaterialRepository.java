@@ -32,7 +32,7 @@ public interface DiscardMaterialRepository extends JpaRepository<DiscardMaterial
                         @Param("startDate") LocalDateTime startDate,
                         @Param("endDate") LocalDateTime endDate);
 
-        @Query("SELECT new com.backend.api.dtos.DepartmentDiscardSummaryDTO(d.department.name, COUNT(d)) " +
+        @Query("SELECT new com.backend.api.dtos.department.DepartmentDiscardSummaryDTO(d.department.name, COUNT(d)) " +
                         "FROM DiscardMaterial d " +
                         "WHERE d.department.company.id = :companyId " +
                         "AND (:departmentName IS NULL OR :departmentName = '' OR LOWER(d.department.name) LIKE LOWER(CONCAT('%', :departmentName, '%'))) "
@@ -50,7 +50,7 @@ public interface DiscardMaterialRepository extends JpaRepository<DiscardMaterial
                         @Param("startDate") LocalDateTime startDate,
                         @Param("endDate") LocalDateTime endDate);
 
-        @Query("SELECT new com.backend.api.dtos.DiscardTypeSummaryDTO(d.type, COUNT(d)) " +
+        @Query("SELECT new com.backend.api.dtos.discard_material.DiscardTypeSummaryDTO(d.type, COUNT(d)) " +
                         "FROM DiscardMaterial d " +
                         "WHERE d.department.company.id = :companyId " +
                         "AND (:departmentName IS NULL OR :departmentName = '' OR LOWER(d.department.name) LIKE LOWER(CONCAT('%', :departmentName, '%'))) "
@@ -81,4 +81,5 @@ public interface DiscardMaterialRepository extends JpaRepository<DiscardMaterial
                         @Param("status") DiscardStatus status,
                         @Param("startDate") LocalDateTime startDate,
                         @Param("endDate") LocalDateTime endDate);
+
 }

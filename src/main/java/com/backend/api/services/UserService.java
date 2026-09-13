@@ -33,7 +33,6 @@ public class UserService {
             DepartmentRepository departmentRepository,
             PasswordEncoder passwordEncoder,
             SecurityContextRepository securityContextRepository) {
-
         this.userRepository = userRepository;
         this.departmentRepository = departmentRepository;
         this.passwordEncoder = passwordEncoder;
@@ -41,7 +40,6 @@ public class UserService {
     }
 
     public UserResponseDTO create(UserRequestDTO dto) {
-
         if (userRepository.existsByEmail(dto.email())) {
             throw new RuntimeException("E-mail já cadastrado.");
         }
@@ -50,7 +48,6 @@ public class UserService {
                 .orElseThrow(() -> new RuntimeException("Departamento não encontrado."));
 
         User user = new User();
-
         user.setFirstName(dto.firstName());
         user.setLastName(dto.lastName());
         user.setEmail(dto.email());
@@ -76,32 +73,48 @@ public class UserService {
         Authentication auth = new UsernamePasswordAuthenticationToken(
                 user.getId(),
                 null,
-                Collections.emptyList());
+                Collections.emptyList()
+        );
 
         SecurityContext context = SecurityContextHolder.createEmptyContext();
         context.setAuthentication(auth);
         SecurityContextHolder.setContext(context);
 
         request.getSession(true);
-
         securityContextRepository.saveContext(
                 context,
                 request,
-                response);
+                response
+        );
 
         return toResponse(user);
     }
 
     public UserResponseDTO findByEmail(String email) {
-
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado."));
 
         return toResponse(user);
     }
 
-    public void logout(HttpServletRequest request) {
+    public UserResponseDTO findById(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado."));
 
+        return toResponse(user);
+    }
+
+    public UserResponseDTO getCurrentUser(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new RuntimeException("Usuário não autenticado.");
+        }
+
+        Long userId = Long.valueOf(authentication.getName());
+
+        return findById(userId);
+    }
+
+    public void logout(HttpServletRequest request) {
         HttpSession session = request.getSession(false);
 
         if (session != null) {
@@ -112,28 +125,23 @@ public class UserService {
     }
 
     public List<UserResponseDTO> findAll() {
-
         return userRepository.findAll()
                 .stream()
                 .map(this::toResponse)
                 .toList();
     }
 
-    public UserResponseDTO findById(Long id) {
-
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado."));
-
-        return toResponse(user);
-    }
-
     public UserResponseDTO update(Long id, UserRequestDTO dto) {
-
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado."));
 
         Department department = departmentRepository.findById(dto.departmentId())
                 .orElseThrow(() -> new RuntimeException("Departamento não encontrado."));
+
+        if (!user.getEmail().equals(dto.email())
+                && userRepository.existsByEmail(dto.email())) {
+            throw new RuntimeException("E-mail já cadastrado.");
+        }
 
         user.setFirstName(dto.firstName());
         user.setLastName(dto.lastName());
@@ -148,7 +156,6 @@ public class UserService {
     }
 
     public void delete(Long id) {
-
         if (!userRepository.existsById(id)) {
             throw new RuntimeException("Usuário não encontrado.");
         }
@@ -157,13 +164,13 @@ public class UserService {
     }
 
     private UserResponseDTO toResponse(User user) {
-
         return new UserResponseDTO(
                 user.getId(),
                 user.getFirstName(),
                 user.getLastName(),
                 user.getEmail(),
                 user.getDepartment().getId(),
-                user.getDepartment().getName());
+                user.getDepartment().getName()
+        );
     }
 }

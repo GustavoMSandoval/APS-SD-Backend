@@ -1,0 +1,230 @@
+### =====================================================
+### EMPRESAS
+### =====================================================
+
+### Criar Empresa Alpha
+POST http://localhost:8080/api/companies
+Content-Type: application/json
+
+{
+  "cnpj": "12.345.678/0001-90",
+  "name": "Empresa Alpha",
+  "email": "admin@alpha.com",
+  "password": "123456",
+  "phone": "11999999999"
+}
+
+###
+
+### Criar Empresa Beta
+POST http://localhost:8080/api/companies
+Content-Type: application/json
+
+{
+  "cnpj": "98.765.432/0001-10",
+  "name": "Empresa Beta",
+  "email": "admin@beta.com",
+  "password": "123456",
+  "phone": "11988887777"
+}
+
+### LOGIN EMPRESA ALPHA
+POST http://localhost:8080/api/companies/login
+Content-Type: application/json
+
+{
+  "email": "admin@alpha.com",
+  "password": "123456"
+}
+
+### LOGIN EMPRESA BETA
+POST http://localhost:8080/api/companies/login
+Content-Type: application/json
+
+{
+  "email": "admin@beta.com",
+  "password": "123456"
+}
+
+### LOGOUT
+POST http://localhost:8080/api/companies/logout
+Content-Type: application/json
+
+### =====================================================
+### DEPARTAMENTOS - EMPRESA ALPHA (ID 1)
+### =====================================================
+
+### Criar departamento TI
+POST http://localhost:8080/api/departments
+Content-Type: application/json
+Cookie: JSESSIONID=34E301DBA41BB03890F764797C1CCC7B
+
+{
+  "name": "TI",
+  "description": "Tecnologia da Informação",
+  "responsibleName": "Responsável TI",
+  "companyId": 1
+}
+
+###
+
+### Criar departamento RH
+POST http://localhost:8080/api/departments
+Content-Type: application/json
+
+{
+  "name": "RH",
+  "description": "Recursos Humanos",
+  "responsibleName": "Responsável RH",
+  "companyId": 1
+}
+
+### =====================================================
+### DEPARTAMENTOS - EMPRESA BETA (ID 2)
+### =====================================================
+
+### Criar departamento Produção
+POST http://localhost:8080/api/departments
+Content-Type: application/json
+Cookie: JSESSIONID=81B0B1E01F73B1CDCF586915E608D124
+
+{
+  "name": "Produção",
+  "description": "Departamento de Produção",
+  "responsibleName": "Responsável Produção",
+  "companyId": 2
+}
+
+### =====================================================
+### USUÁRIOS
+### =====================================================
+
+### Criar João - TI - Empresa Alpha
+POST http://localhost:8080/api/users
+Content-Type: application/json
+
+{
+  "firstName": "João",
+  "lastName": "Silva",
+  "email": "joao@alpha.com",
+  "password": "123456",
+  "departmentId": 1
+}
+
+###
+
+### Criar Maria - RH - Empresa Alpha
+POST http://localhost:8080/api/users
+Content-Type: application/json
+
+{
+  "firstName": "Maria",
+  "lastName": "Santos",
+  "email": "maria@alpha.com",
+  "password": "123456",
+  "departmentId": 2
+}
+
+###
+
+### Criar Carlos - Produção - Empresa Beta
+POST http://localhost:8080/api/users
+Content-Type: application/json
+
+{
+  "firstName": "Carlos",
+  "lastName": "Oliveira",
+  "email": "carlos@beta.com",
+  "password": "123456",
+  "departmentId": 3
+}
+
+### =====================================================
+### LOGIN DE USUÁRIOS (UserLoginDTO)
+### =====================================================
+
+### LOGIN João (TI - Empresa Alpha)
+POST http://localhost:8080/api/users/login
+Content-Type: application/json
+
+{
+  "email": "joao@alpha.com",
+  "password": "123456"
+}
+
+### LOGIN Maria (RH - Empresa Alpha)
+POST http://localhost:8080/api/users/login
+Content-Type: application/json
+
+{
+  "email": "maria@alpha.com",
+  "password": "123456"
+}
+
+### =====================================================
+### DESCARTES DE MATERIAL (DiscardMaterialRequestDTO)
+### =====================================================
+
+### Criar Descarte - João (TI - Alpha)
+POST http://localhost:8080/api/discard-materials
+Content-Type: application/json
+Cookie: JSESSIONID=1047B253EA54B5D54B89014C73BB3893
+
+{
+  "type": "REUSE", 
+  "description": "Descarte de mouses e teclados antigos que pararam de funcionar.",
+  "discardDate": "2026-09-12T14:30:00",
+  "weight": 5.5,
+  "userId": 1,
+  "status": "PENDING",
+  "departmentId": 1
+}
+
+### Criar Descarte - Maria (RH - Alpha)
+POST http://localhost:8080/api/discards
+Content-Type: application/json
+Cookie: JSESSIONID=COLOQUE_AQUI_O_COOKIE_DA_MARIA
+
+{
+  "type": "RECYCLING", 
+  "description": "Descarte de arquivos antigos e caixas de papelão.",
+  "discardDate": "2026-09-13T09:15:00",
+  "weight": 12.0,
+  "userId": 2,
+  "status": "APROVED",
+  "departmentId": 2
+}
+
+
+### =====================================================
+### HISTÓRICO DE STATUS (DiscardMaterialStatusHistoryRequestDTO)
+### =====================================================
+
+### Atualizar Status do Descarte (Exemplo para o Descarte de ID 1)
+# O método pode ser PATCH ou POST dependendo do seu Controller
+PATCH http://localhost:8080/api/discard-materials/1/status
+Content-Type: application/json
+Cookie: JSESSIONID=1047B253EA54B5D54B89014C73BB3893
+
+{
+  "status": "COMPLETED"
+}
+
+
+### =====================================================
+### DASHBOARD (DashboardResponseDTO)
+### =====================================================
+
+### Obter dados do Dashboard (Geralmente é um GET)
+GET http://localhost:8080/api/dashboard
+Accept: application/json
+Cookie: JSESSIONID=1047B253EA54B5D54B89014C73BB3893
+
+###
+POST http://localhost:8080/api/discard-materials/1/history
+Content-Type: application/json
+Cookie: JSESSIONID=1047B253EA54B5D54B89014C73BB3893
+
+{
+  "status": "PENDING"
+}
