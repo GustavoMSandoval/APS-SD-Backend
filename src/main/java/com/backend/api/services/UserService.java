@@ -39,6 +39,16 @@ public class UserService {
         this.securityContextRepository = securityContextRepository;
     }
 
+    private UserResponseDTO toResponse(User user) {
+        return new UserResponseDTO(
+                user.getId(),
+                user.getFirstName(),
+                user.getLastName(),
+                user.getEmail(),
+                user.getDepartment().getId(),
+                user.getDepartment().getName());
+    }
+
     public UserResponseDTO create(UserRequestDTO dto) {
         if (userRepository.existsByEmail(dto.email())) {
             throw new RuntimeException("E-mail já cadastrado.");
@@ -161,16 +171,5 @@ public class UserService {
         }
 
         userRepository.deleteById(id);
-    }
-
-    private UserResponseDTO toResponse(User user) {
-        return new UserResponseDTO(
-                user.getId(),
-                user.getFirstName(),
-                user.getLastName(),
-                user.getEmail(),
-                user.getDepartment().getId(),
-                user.getDepartment().getName()
-        );
     }
 }
